@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Dov@GamesThatWork.com">
+    <title>UNSCREW U: Sample Host (CT3)</title>
+    <style>
+pre         { background-color:#666; color:#FFF; font-size: 1.3em; padding: 8px 32px; margin:12px;}
+header      { background-color:#000; color:#FFF; border: thin solid gold; font-size: 0.8em; padding: 1px 32px; position:absolute; right:0; top:0; }
+div.api     { background-color:rgb(201, 201, 201); border: thin solid black; font-size: .6em; padding: 8px; margin:90px auto; width:fit-content;}
+div.report  { background-color:#222; border: thin solid black; font-size: 1.2em; padding: 8px; color:grey; margin:120px 60px 30px 60px;}
+.report div { background-color:#222; border: thin solid grey; font-size: .6em; padding: 2px;    margin:3px 6px; color: yellow;}
+.report span{ background-color:#000; border: thin solid grey;padding: 3px; margin:2px 6px 2px 30px; color: grey;}
+    </style>
+
+
+    <script type="module">
+
+        import remotecontrol from "/remotecontrol.js";
+
+        var unscrewu;                                   // this will be the remotecontrol interface to the game
+        
+        const config ={
+            url:        "/testgame.html",               // REQUIRED: the game's url must be in the same domain as you
+            messageHandler: console.log,                 // IMPORTANT (BUT NOT REQUIRED): What to do with incoming messages       
+            autostart: false,                           // OPTIONAL: if true, game begins playing on launch
+            log: document.querySelector("div.report"),  // OPTIONAL: if you supply a dom element, a log will be maintained for you
+           }
+
+        function run(){        
+            document.querySelector("button.launch").addEventListener( "click", e=>{
+
+                unscrewu = remotecontrol.launchGame(  config  );   // create the game's remotecontrol 
+                                                                   // and attach a button to each of its 4 methods   
+
+                document.querySelector("button.start" ).addEventListener( "click",   
+                        unscrewu.start  );
+                
+                document.querySelector("button.report").addEventListener( "click",   
+                        unscrewu.report );
+
+                document.querySelector("button.end"   ).addEventListener( "click", e=>{
+                        unscrewu.end();                                                       
+                        setTimeout( run, 500 );
+                        });
+                document.querySelector("button.play"  ).addEventListener( "click", e=>
+                        unscrewu.play( 
+                            document.querySelector("input.episode").value ?? 1,
+                            document.querySelector("input.passage").value ?? 0) );
+
+
+
+                document.querySelectorAll("input,button").forEach( b=> b.disabled=false);
+                e.currentTarget.disabled=true;
+                });
+                }
+        run();
+    </script>
+</head>
+
+<body>
+    <header>This is the host app</header>    
+    <div class="api">
+        <button class="launch"         >     <b> Launch Game   </b>      </button>
+      
+        <button class="start"  disabled>api:<b> start  </b></button>
+        <button class="end"    disabled>api:<b> end    </b></button>
+        <button class="report" disabled>api:<b> report </b></button>
+        <button class="play"   disabled>api:<b> play   </b> </button>
+            from episode <input class="episode" type="number" min="1" max="7" value="1" disabled>
+            passage <input      class="passage" type="number" min="0" max="8" value="0" disabled>
+         
+
+    </div>
+    <div class="report">Here is where you can expect to see reports from the game.</div>
+</body>
+</html>

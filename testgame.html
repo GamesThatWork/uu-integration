@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Dov@GamesThatWork.com">
+    <title>UNSCREW U: Test Game</title>
+<style>
+
+/*responsive layout*/
+
+* { box-sizing: border-box; margin: 0; padding:0;}
+
+/* flow */
+
+@media( min-aspect-ratio: 1/1 ){    body{ flex-direction: row-reverse;     }  }
+@media( max-aspect-ratio: 1/1 ){    body{ flex-direction: column-reverse;  }  }
+body{  display:flex;                                  align-items:stretch;  justify-content:stretch;     overflow: hidden;   }
+#game{  display:flex;                                  align-items:center;   justify-content:center;                          }
+#dash{  display:flex; flex-direction: column-reverse;  align-items:stretch;  justify-content:flex-start;  overflow: hidden;   }
+
+/* sizes */
+#grfx{  min-width:100%;     min-height:100%;              }
+body{      width:100vw;        height:100vh;             }
+@media( min-aspect-ratio: 1/1 ){
+    @media( max-aspect-ratio: 16/9 ){        #view{  width:calc(  900vw / 16);   height: calc( 900vw / 16 );  }          }
+    @media( min-aspect-ratio: 16/9 ){        #view{  width:  100vh;              height: 100vh;               }          }
+    }
+@media( max-aspect-ratio: 1/1 ){
+    @media( min-aspect-ratio: 9/16 ){        #view{  width: calc( 900vh / 16 );  height: calc( 900vh / 16 );   }          }
+    @media( max-aspect-ratio: 9/16){         #view{  width: 100vw;               height: 100vw;                }          }
+    }
+#view{                       flex-shrink: 0;              }
+#dash{          flex-grow:0; flex-shrink: 1;              }
+#dash>div     { flex:     0               0   25%;        }
+#current-step { flex:     1               0      ;        }
+
+header    { position:absolute; right:0;   top: 0;   z-index:1; }
+#ep       { position:absolute; right:6vw; top: 3vh; z-index:1; }
+#report   { position:absolute; left: 3vw; top: 1vh; z-index:1; }
+#win      { position:absolute; left: 3vw; top:25vh; z-index:1; }
+ 
+ 
+
+
+/* ----AESTHETICS--- */
+
+
+
+
+#dash {                             padding: 1vmin; }
+#log>div {          margin:1.2vmin; padding:1.5vmin; }
+#current-step {     margin:1.2vmin; padding:1.5vmin;  font-size: 1.4rem;  font-weight: bold;  text-align: center; }
+#current-step>div { margin:1.2vmin; padding:1.5vmin; font-size: 1.4rem; }
+div[data-jump]  { font-size:2em; font-weight:600; padding: 1px 32px; }
+
+div[data-speaker]::before {
+    content: attr(data-speaker);
+    position:relative;
+    left:-3vmin;
+    top: -2.2vmin;
+    border-radius: .6vmin;
+    padding:0.4vmin;
+    font-size:smaller;
+    }
+     
+ * { font-size: 1.75vmin; }
+
+
+
+
+#view {                     border: .8vmin double darkgoldenrod; }
+#current-step {             border: thin solid black;  }
+#dash>div {                 border: thin solid rgb(158, 45, 211);        }
+#log>div {                  border: thin solid black;  }
+div[data-speaker]::before { border: .21vmin solid rgb(158, 45, 211);    }
+div[data-jump]  {           border: 4px solid black;  }
+div[data-jump]:hover {      border-color:#FFF;  }
+
+
+
+/*    COLORS */
+
+#grfx{      background-image: url(""); background-size: cover;  }
+body{                       background-color:rgb(119, 119, 119);                   }
+#view{                      background-color:rgb(77, 69, 117);                     }
+#dash {                     background-color:rgb(56, 56, 56);                      }
+#current-step {             background-color:rgba(218, 165, 32, 0.384);            }
+#current-step>div {         background-color:goldenrod;                            }
+#current-step>div:hover {   background-color:rgb(238, 174, 12);   color:white;   }
+div[data-speaker]::before { background-color:rgba(245, 243, 153, 0.486);  box-shadow: 1vmin 1vmin rgba(0,0,100, .25);    }
+#log>div {                                                          color:silver;  }
+div[data-jump]  {           background-color:gold; color:#000;  box-shadow:6px 6px 6px;  }
+div[data-jump]:hover {      background-color:rgb(255, 234, 115);  color:rgb(99, 87, 17); }
+
+
+/*** for debugging    ***/
+@media( min-aspect-ratio: 1/1 ){
+    @media( max-aspect-ratio: 16/9 ){   body{ margin:3px;background-color: green;  }   }
+    @media( min-aspect-ratio: 16/9 ){   body{ margin:3px;background-color: red;    }   }
+    }
+@media( max-aspect-ratio: 1/1 ){
+    @media( min-aspect-ratio: 9/16 ){   body{ margin:3px;background-color: blue;    }   }
+    @media( max-aspect-ratio: 9/16){    body{ margin:3px;background-color: yellow;  }   }   
+    }  
+
+ :root {
+	--sid:        #0c0922;
+	--mom:        #f88f22;
+	--angstrom:   #83a1f3;
+	--camille:    #35627f;
+	--lavista:    #f5d07d;
+	--lenox:      #f88f22;
+	--prompt:     #83a1f3;
+    --exposition: #35627f;
+	--etc:        #f5d07d;
+    }
+    
+    div[data-speaker]                  { background-color: var(--etc); color:white;}
+    div[data-speaker*="sid"        i  ]{ background-color: var(--sid);}
+    div[data-speaker*="mom"        i  ]{ background-color: var(--mom);}
+    div[data-speaker*="angstrom"   i  ]{ background-color: var(--angstrom);}
+    div[data-speaker*="camille"    i  ]{ background-color: var(--camille);}
+    div[data-speaker*="lavista"    i  ]{ background-color: var(--lavista);}
+    div[data-speaker*="lenox"      i  ]{ background-color: var(--lenox);}
+    div[data-speaker*="prompt"     i  ]{ background-color: var(--prompt);}
+    div[data-speaker*="etc"        i  ]{ background-color: var(--etc);}
+    div[data-speaker*="exposition" i  ]{ background-color: var(--exposition);}
+    div[data-speaker*="camille"    i  ]{ background-color: var(--camille);}
+    
+    div[data-speaker]::before {background-color: white; border-color:black;color:black; font-weight:900; }
+    div[data-speaker*="sid"        i  ]::before { border-color: var(--sid);        color: var(--sid);}
+    div[data-speaker*="mom"        i  ]::before { border-color: var(--mom);        color: var(--mom);}
+    div[data-speaker*="angstrom"   i  ]::before { border-color: var(--angstrom);   color: var(--angstrom);}
+    div[data-speaker*="camille"    i  ]::before { border-color: var(--camille);    color: var(--camille);}
+    div[data-speaker*="lavista"    i  ]::before { border-color: var(--lavista);    color: var(--lavista);}
+    div[data-speaker*="lenox"      i  ]::before { border-color: var(--lenox);      color: var(--lenox);}
+    div[data-speaker*="prompt"     i  ]::before { border-color: var(--prompt);     color: var(--prompt);}
+    div[data-speaker*="etc"        i  ]::before { border-color: var(--etc);        color: var(--etc);}
+    div[data-speaker*="exposition" i  ]::before { border-color: var(--exposition); color: var(--exposition);}
+    div[data-speaker*="camille"    i  ]::before { border-color: var(--camille);    color: var(--camille);}
+
+
+
+header       { background-color:rgb(117, 23, 23); color:#FFF; border: thin solid gold; font-size: 0.8em; padding: 1px 32px;  }
+#report     { background-color:#222; border: thin solid black; font-size: 1.2em; padding: 8px; color:grey; }
+#report div { background-color:#222; border: thin solid grey; font-size: .6em; padding: 2px;    margin:3px 6px; color: yellow;}
+#report span{ background-color:#000; border: thin solid grey;padding: 3px; margin:2px 6px 2px 30px; color: grey;}
+
+#ep         { background-color:rgba(12,12,12,0.26); color:gold; padding:1rem; }
+#ep, #ep *  { font-size:2.3rem; text-align:center; line-height: 3rem; }
+#win        { background-color:rgba(190,12,12,0.12); color:gold; font-size:12rem; text-align:center; }
+
+
+
+</style>
+
+<script type="module">
+
+import remotecontrol from "/remotecontrol.js";
+
+const imgURL = "https://storage.googleapis.com/unscrew-u/ct3-demo/media/";
+
+window.onload= e=>
+    document.querySelector( "#grfx" ).style.backgroundImage=`url(${imgURL}uus.png)`;
+
+document.body.addEventListener( "mousedown" , e=>{
+    document.querySelector( "#grfx" ).style.backgroundImage=`url(${imgURL}unscrewu.png)`;
+    document.body.requestFullscreen({ navigationUI: "hide" });
+    }, {once:true});
+
+const state={    status: "wait",    episode: 1,    passage: 0,    score: 0    }
+
+
+const host =  remotecontrol.getHost({ play, log:document.querySelector("#report") });
+
+
+
+
+
+
+
+function play( gamePoint ){
+    const { episode=state.episode, passage=0 } = gamePoint;
+    state.score+= Math.floor( Math.random()*20);
+    document.querySelector( "#ep").hidden=false;
+    document.querySelector( "#win").hidden=false;
+    document.querySelector( "#report").hidden=false;
+    document.querySelector( "span.episode").innerText= state.episode = episode;
+    document.querySelector( "span.passage").innerText= state.passage = passage;
+    state.status = "playing";
+    let img= document.querySelector( "#grfx"  );
+    let aud= document.querySelector( "audio" );
+    img.style.opacity=0;
+    setTimeout( ()=>img.style.backgroundImage = `url(${imgURL}${image[ episode ][ passage%image[episode].length ] }.png)`, 750);
+    setTimeout( ()=>img.style.opacity=1, 1000);
+    setTimeout( ()=>aud.src = `${imgURL}${image[ episode ][ 0].replace("1","")}.ogg`, 250);
+    document.querySelector( "#win"  ).innerText="";
+    
+    please.report({ status: "playihg"})
+    }
+
+
+
+const please ={
+    start:  () => {
+        please.report({status:"start"});
+        please.play({ episode:1, passage:0 });
+        },
+    play,
+    end:    () =>{
+        please.report( {status:"end"});
+        window.close();
+        },
+    report: host.report,
+    fail:   data => console.err( "invalid api instuction", data )
+    }
+
+    
+
+    const image=[
+        [],
+        ["road", "dorm"],
+        ["classroom1","classroom2","classroom3"],
+        ["vegas1","vegas2"],
+        ["moon1","moon2","moon3"],
+        ["bridge1","bridge2"],
+        ["scam"],
+        ["boat"],
+    ];
+
+    document.querySelectorAll( "div[data-jump]").forEach( j=>
+       j.addEventListener( "click", event=> {
+            if( ++state.passage <=3 ) {
+                document.querySelector( "audio" ).volume=1;
+                document.querySelector( "#grfx"  ).style.opacity=1;
+                document.querySelector( "#win"  ).innerText= "";
+                please.play( state  );
+                }
+            else {
+                please.report({ status: state.episode==7? "win":"complete"})
+                document.querySelector( "#ep"   ).hidden=true;
+                document.querySelector( "audio" ).volume=0.05;
+                document.querySelector( "#grfx" ).style.opacity=0.2;
+                document.querySelector( "#win"  ).innerText= 
+                    state.episode==7? `Game Over`: `Episode ${state.episode} Complete`;;
+                }}));
+
+    please.report();
+
+</script>
+</head>
+<body>
+ 
+
+ <div id="game">
+    <div id="view">
+        <div id="grfx"></div>
+        </div>
+    </div>
+<div id="dash">
+    <div id="current-step" >
+        <div data-jump="Reject Help"> 
+            I'll figure it out on my own. 
+            </div>
+        <div data-jump="Camille Helps with Exercise">
+            I doubt that anybody can solve this!
+            </div>
+        <div data-jump="Bad Choice Number Three">
+            Are you sure you know what you are doing?
+            </div>
+        <div data-jump="Good Choice">
+            I'd really appreciate that.
+            </div>
+                                </div>
+      <div id="log" >
+
+        <div data-speaker= "Sid">
+            Way to rub it in my face.                </div>
+        <div data-speaker= "Camille">
+            I meant, like, I could help you out.<br/>
+            You know, if you wanted to, I mean.<br/>
+            If not, that's cool too.    </div>                
+        <div data-speaker= "exposition">
+            As you struggle with the Think Machine exercises,<br/>
+            you feel a tap on the shoulder.<br/>
+            It's the cat gene-splice girl.    </div>
+        <div data-speaker= "Camille">
+            These doohickies are a real pain, am I right?    </div>
+        <div data-speaker= "Sid">
+            Yeah, they really are.    </div>
+        <div data-speaker= "Camille">
+            I'm Camille. Cam for short.<br/>
+            I've been messing around on mine for a while.<br/>
+            I think I've got the hang of it.    </div>
+        <div data-speaker= "Sid">
+            Way to rub it in my face.                </div>
+        <div data-speaker= "Camille">
+            I meant, like, I could help you out.<br/>
+            You know, if you wanted to, I mean.<br/>
+            If not, that's cool too.    </div>                
+        <div data-speaker= "exposition">
+            As you struggle with the Think Machine exercises,<br/>
+            you feel a tap on the shoulder.<br/>
+            It's the cat gene-splice girl.    </div>
+        <div data-speaker= "Camille">
+            These doohickies are a real pain, am I right?    </div>
+        <div data-speaker= "Sid">
+            Yeah, they really are.    </div>
+        <div data-speaker= "Camille">
+            I'm Camille. Cam for short.<br/>
+            I've been messing around on mine for a while.<br/>
+            I think I've got the hang of it.    </div>
+        <div data-speaker= "Sid">
+            Way to rub it in my face.                </div>
+        <div data-speaker= "Camille">
+            I meant, like, I could help you out.<br/>
+            You know, if you wanted to, I mean.<br/>
+            If not, that's cool too.    </div>                
+        <div >
+            As you struggle with the Think Machine exercises,
+            you feel a tap on the shoulder.
+            It's the cat gene-splice girl. 
+            You are surprized. What on earth does she want? </div>
+        <div data-speaker= "Camille">
+            These doohickies are a real pain, am I right?    </div>
+        <div data-speaker= "Sid">
+            Yeah, they really are.    </div>
+        <div data-speaker= "Camille">
+            I'm Camille. They call me Cam for short.<br/>
+            I've been messing around on mine for a while.
+            And now I kinda I think I've got the hang of it.    </div>
+        <div data-speaker= "Sid">
+            Way to rub it in my face.                </div>
+        <div data-speaker= "Camille">
+            I meant, like, I could help you out.
+            You know, if you wanted to, I mean. But hey!
+            If not, that's cool too.    </div>
+
+      </div>
+</div>
+    <header>This is the placeholder game</header>    
+    <audio src="" loop autoplay></audio>
+    <div id="win"    hidden></div>
+    <div id="report" hidden ></div>
+    <div id="ep"     hidden>
+        <p>Episode <span class="episode"></span> </p>
+        <p>Passage  <span class="passage"></span></p>
+        </div>
+</body>
+</html>
